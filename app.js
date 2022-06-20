@@ -1,9 +1,11 @@
 const fs = require('fs')
 const express = require('express')
+const morgan = require('morgan')
 
 const app = express()
 
-// here we start to define our middlewares
+// 1) MIDDLEWARES
+app.use(morgan('dev'))
 app.use(express.json()) // to read the req object
 
 // middleware that is goind to executed of second
@@ -23,6 +25,7 @@ app.use((req, res, next) => {
 
 const tours = JSON.parse(fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`))
 
+// 2) ROUTES HANDLERS
 const getAllTours = (req, res) => {
   console.log(req.requestTime)
   res.status(200).json({
@@ -124,6 +127,7 @@ const deleteTour = (req,res) => {
 // app.patch('/api/v1/tours/:id', updateTour)
 // app.delete('/api/v1/tours/:id', deleteTour)
 
+// 3) ROUTES
 app
   .route('/api/v1/tours')
   .get(getAllTours)
@@ -135,6 +139,7 @@ app
   .patch(updateTour)
   .delete(deleteTour)
 
+// 4) START SERVER
 const port = 3000
 app.listen(port, () => {
   console.log(`App running on port ${port}`)
