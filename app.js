@@ -2,12 +2,32 @@ const fs = require('fs')
 const express = require('express')
 
 const app = express()
-app.use(express.json())
+
+// here we start to define our middlewares
+app.use(express.json()) // to read the req object
+
+// middleware that is goind to executed of second
+// this is a global middleware (is executed before any route)
+app.use((req, res, next) => {
+  console.log('Hello from the middleware')
+  // we need to execute de next() function or else
+  // we won't be able to finish our execution
+  next()
+})
+
+app.use((req, res, next) => {
+  req.requestTime = new Date().toISOString()
+  next()
+})
+
+
 const tours = JSON.parse(fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`))
 
 const getAllTours = (req, res) => {
+  console.log(req.requestTime)
   res.status(200).json({
     status: 'success',
+    requestAt: req.requestTime,
     results: tours.length,
     data: {
       tours
