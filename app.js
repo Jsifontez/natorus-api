@@ -163,27 +163,36 @@ const deleteUser = (req, res) => {
 // app.delete('/api/v1/tours/:id', deleteTour)
 
 // 3) ROUTES
-app
-  .route('/api/v1/tours')
+// this create a new router middleware to isolate and
+// create a sort of sub-app.
+// This process is called: Mounting the router
+const tourRouter = express.Router()
+const userRouter = express.Router()
+
+tourRouter
+  .route('/')
   .get(getAllTours)
   .post(createTour)
 
-app
-  .route('/api/v1/tours/:id')
+tourRouter
+  .route('/:id')
   .get(getTour)
   .patch(updateTour)
   .delete(deleteTour)
 
-app
-  .route('/api/v1/users')
+userRouter
+  .route('/')
   .get(getAllUsers)
   .post(createUser)
 
-app
-  .route('/api/v1/users/:id')
+userRouter
+  .route('/:id')
   .get(getUser)
   .patch(updateUser)
   .delete(deleteUser)
+
+app.use('/api/v1/tours', tourRouter) // we use a router to handle all request for that path
+app.use('/api/v1/users', userRouter)
 
 // 4) START SERVER
 const port = 3000
