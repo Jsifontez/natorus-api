@@ -6,6 +6,8 @@ const tourController = require('../controllers/tourController')
 // This process is called: Mounting the router
 const router = express.Router()
 
+router.param('id', tourController.checkID)
+
 router
   .route('/')
   .get(tourController.getAllTours)
