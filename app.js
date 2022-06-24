@@ -9,6 +9,7 @@ const app = express()
 // 1) MIDDLEWARES
 app.use(morgan('dev'))
 app.use(express.json()) // to read the req object
+app.use(express.static(`${__dirname}/public`))
 
 // middleware that is goind to executed of second
 // this is a global middleware (is executed before any route)
