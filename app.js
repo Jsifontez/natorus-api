@@ -27,7 +27,6 @@ app.use((req, res, next) => {
   next()
 })
 
-
 app.use('/api/v1/tours', tourRouter) // we use a router to handle all request for that path
 app.use('/api/v1/users', userRouter)
 
