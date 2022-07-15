@@ -3,8 +3,25 @@ const Tour = require('../models/tourModel')
 // 2) ROUTES HANDLERS (CONTROLLERS)
 exports.getAllTours = async (req, res) => {
   try {
-    const tours = await Tour.find()
+    // BUILD QUERY
+    const queryObj = { ...req.query }
+    const excludeFields = ['page', 'sort', 'limit', 'fields']
+    excludeFields.forEach((el) => delete queryObj[el])
 
+    console.log(req.query, queryObj)
+
+    const query = Tour.find(queryObj)
+
+    // const query = Tour.find()
+    //   .where('duration')
+    //   .equals(5)
+    //   .where('difficulty')
+    //   .equals('easy')
+
+    // EXECUTE QUERY
+    const tours = await query
+
+    // SEND RESPONSE
     res.status(200).json({
       status: 'success',
       results: tours.length,
