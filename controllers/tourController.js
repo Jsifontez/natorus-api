@@ -3,23 +3,31 @@ const Tour = require('../models/tourModel')
 // 2) ROUTES HANDLERS (CONTROLLERS)
 exports.getAllTours = async (req, res) => {
   try {
+    console.log(req.query)
     // BUILD QUERY
+    // 1) filtering
     const queryObj = { ...req.query }
     const excludeFields = ['page', 'sort', 'limit', 'fields']
     excludeFields.forEach((el) => delete queryObj[el])
 
-    console.log(req.query, queryObj)
+    // 2) advanced filtering
+    // create a string of queryObj
+    let queryStr = JSON.stringify(queryObj)
+    // replace globally the filtering options
+    queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, match => `$${match}`)
 
-    const query = Tour.find(queryObj)
+    // use the queryStr but in object
+    const query = Tour.find(JSON.parse(queryStr))
+
+
+    // EXECUTE QUERY
+    const tours = await query
 
     // const query = Tour.find()
     //   .where('duration')
     //   .equals(5)
     //   .where('difficulty')
     //   .equals('easy')
-
-    // EXECUTE QUERY
-    const tours = await query
 
     // SEND RESPONSE
     res.status(200).json({
