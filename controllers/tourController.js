@@ -1,6 +1,16 @@
 const Tour = require('../models/tourModel')
 
 // 2) ROUTES HANDLERS (CONTROLLERS)
+// alias for the top 5 courses
+exports.aliasTopTours = (req, res, next) => {
+  // the elements are set to strings because the query is
+  // made of strings, and here we don't change to await the query
+  req.query.limit = '5'
+  req.query.sort = '-ratingsAverage,price'
+  req.query.fields = 'name,price,ratingsAverage,summary,diffciulty'
+  next()
+}
+
 exports.getAllTours = async (req, res) => {
   try {
     console.log(req.query)
