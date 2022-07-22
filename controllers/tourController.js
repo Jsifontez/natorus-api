@@ -14,12 +14,12 @@ exports.getAllTours = async (req, res) => {
     // create a string of queryObj
     let queryStr = JSON.stringify(queryObj)
     // replace globally the filtering options
-    queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, match => `$${match}`)
+    queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`)
 
     // use the queryStr but in object
     let query = Tour.find(JSON.parse(queryStr))
 
-    // 3) Sorting
+    // 2) Sorting
     if (req.query.sort) {
       // we create a string of fields space separated
       const sortBy = req.query.sort.split(',').join(' ')
@@ -29,13 +29,26 @@ exports.getAllTours = async (req, res) => {
       query = query.sort('-createdAt')
     }
 
-    // 4) Field limiting
+    // 3) Field limiting
     if (req.query.fields) {
       const fields = req.query.fields.split(',').join(' ')
       query = query.select(fields)
     } else {
       // we excluede the `__v` field created by mongo in the default query
       query = query.select('-__v')
+    }
+
+    // 4) Pagination
+    const page = req.query.page * 1 || 1
+    const limit = req.query.limit * 1 || 100
+    const skip = (page - 1) * limit
+
+    // page=3&limit=10, 1-10, page 1; 11-20, page 2; 21-30, page 3
+    query = query.skip(skip).limit(limit)
+
+    if (req.query.page) {
+      const numTours = await Tour.countDocuments()
+      if (skip >= numTours) throw new Error('This page does not exist')
     }
 
     // EXECUTE QUERY
