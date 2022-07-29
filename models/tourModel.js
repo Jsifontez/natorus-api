@@ -89,6 +89,15 @@ tourSchema.pre(/^find/, function (next) {
   next()
 })
 
+// AGGREGATION MIDDLEWARE
+tourSchema.pre('aggregate', function (next) {
+  // here we get the array pipeline that we code on the controller
+  // console.log(this.pipeline())
+  // we add a match element at the beginning of the array
+  this.pipeline().unshift({ $match: { secretTour: { $ne: true } } })
+  next()
+})
+
 const Tour = mongoose.model('Tour', tourSchema)
 
 module.exports = Tour
