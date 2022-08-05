@@ -1,6 +1,8 @@
 const express = require('express')
 const morgan = require('morgan')
 
+const AppError = require('./utils/appError')
+const globalErrorHandler = require('./controllers/errorController')
 const tourRouter = require('./routes/tourRoutes')
 const userRouter = require('./routes/userRoutes')
 
@@ -26,36 +28,20 @@ app.use('/api/v1/users', userRouter)
  * We use the '*' all url possible
  **/
 app.all('*', (req, res, next) => {
-  // res.status(404).json({
-  //   status: 'fail',
-  //   message: `Can't find ${req.originalUrl} on this server!`,
-  // })
-
-  // here we create an error and the argument that it takes
-  // if the message of that error
-  const err = new Error(`Can't find ${req.originalUrl} on this server!`)
-  err.status = 'fail'
-  err.statusCode = 404
-
-  // if we pass an argument to the 'next' function express will know
-  // that an error happened and the next middleware that will trigger
-  // if the error middleware
-  next(err)
+  /**
+   * if we pass an argument to the 'next' function express will know
+   * that an error happened and the next middleware that will trigger
+   * if the error middleware.
+   * If we use a class error create, pass a new instance of that class to 'next' method
+   **/
+  next(new AppError(`Can't find ${req.originalUrl} on this server!`), 404)
 })
 
 /**
  * If we use and middleware with a callback that take 4 arguments
  * Express will know that this is an error handling middleware
  **/
-app.use((err, req, res, next) => {
-  err.statusCode = err.statusCode || 500
-  err.status = err.status || 'error'
-
-  res.status(err.statusCode).json({
-    status: err.status,
-    message: err.message,
-  })
-})
+app.use(globalErrorHandler)
 
 // 4) START SERVER
 module.exports = app
