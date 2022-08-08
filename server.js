@@ -18,6 +18,21 @@ mongoose
   .then(() => console.log('DB connection successful!'))
 
 const port = process.env.PORT || 3000
-app.listen(port, () => {
+const server = app.listen(port, () => {
   console.log(`App running on port ${port}`)
+})
+
+/**
+ * We use process.on to subscribe to all the possible unhandled rejections that
+ * may occurs and we no have any backup. So, this is our final backup for all
+ * errors.
+ * Here we use the 'server.close()' to await to all handled request finish
+ * before 'exit' the process
+ **/
+process.on('unhandledRejection', (err) => {
+  console.log('UNHANDLED REJECTION! Shutting down the app...')
+  console.log(`Error: ${err.name}. Message: ${err.message}`)
+  server.close(() => {
+    process.exit(1)
+  })
 })
