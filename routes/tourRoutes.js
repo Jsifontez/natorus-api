@@ -1,5 +1,6 @@
 const express = require('express')
 const tourController = require('../controllers/tourController')
+const authController = require('../controllers/authController')
 
 // this create a new router middleware to isolate and
 // create a sort of sub-app.
@@ -17,7 +18,7 @@ router.route('/monthly-plan/:year').get(tourController.getMonthlyPlan)
 
 router
   .route('/')
-  .get(tourController.getAllTours)
+  .get(authController.protect, tourController.getAllTours)
   .post(tourController.createTour)
 
 router
