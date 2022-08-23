@@ -124,3 +124,28 @@ exports.restrictTo =
 
     next()
   }
+
+exports.forgotPassword = catchAsync(async (req, res, next) => {
+  // 1) Get user based on POSTed email
+  const user = await User.findOne({ email: req.body.email })
+
+  // 1.5) verify if the user exist
+  if (!user) {
+    return next(new AppError('There is no user with that email address.', 404))
+  }
+
+  // 2) Generate the random reset token
+  // We use a instance method of our model because the reset password if more
+  // a DB subjet than the controller
+  const resetToken = user.createPasswordResetToken()
+
+  // with the instance method we're changing the user data. Now we need to save it
+  // but we need to pass and option to invalid all validators set in out model
+  // otherwise it throw and error, because the save method need al elements
+  // required in our model
+  await user.save({ validateBeforeSave: false })
+
+  // 3) Send it to user's email
+})
+
+exports.resetPassword = (req, res, next) => {}
